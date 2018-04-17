@@ -1,4 +1,5 @@
-Name='IA7'
+[System]
+Name='LogicaDifusa'
 Type='mamdani'
 Version=2.0
 NumInputs=2
