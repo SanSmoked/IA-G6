@@ -9,11 +9,11 @@ from skfuzzy import control as ctrl
 
 # New Antecedent/Consequent objects hold universe variables and membership
 # functions
-MetX = np.arange(0, 26, 1)
+MetX = np.arange(0, 30, 1)
 MetodoUsado = ctrl.Antecedent(MetX, 'MetodoUsado')
 
-edad = ctrl.Antecedent(np.arange(16, 71, 1), 'edad')
-hijos = ctrl.Antecedent(np.arange(0, 11, 1), 'hijos')
+edad = ctrl.Antecedent(np.arange(12, 55, 1), 'edad')
+hijos = ctrl.Antecedent(np.arange(0, 16, 1), 'hijos')
 
 EfectX = np.arange(0, 26, 1)
 efectividad = ctrl.Consequent(EfectX, 'efectividad')
@@ -23,35 +23,41 @@ efectividad = ctrl.Consequent(EfectX, 'efectividad')
 #edad.automf(3)
 #TerceraVariableDeEntrada.automf(3)
 
-MetodoUsado['NoUso'] = fuzz.trapmf(MetodoUsado.universe, [0, 0, 5, 10])
-MetodoUsado['CortoPlazo'] = fuzz.trapmf(MetodoUsado.universe, [5, 10, 15, 20])
-MetodoUsado['LargoPlazo'] = fuzz.trapmf(MetodoUsado.universe, [15, 20, 25, 25])
+
+MetodoUsado['CortoPlazo'] = fuzz.trapmf(MetodoUsado.universe, [0, 0, 3, 5])
+MetodoUsado['LargoPlazo'] = fuzz.trapmf(MetodoUsado.universe, [3, 5, 30, 30])
+
+MetodoUsado.view()
 
 fuzz.centroid
 
-edad['Joven'] = fuzz.trapmf(edad.universe, [15, 15, 22, 27])
-edad['Madura'] = fuzz.trapmf(edad.universe, [25, 29, 43, 46])
-edad['Vieja'] = fuzz.trapmf(edad.universe, [45, 48, 70, 70])
+edad['Joven'] = fuzz.trapmf(edad.universe, [12, 12, 20, 25])
+edad['Madura'] = fuzz.trapmf(edad.universe, [20, 25, 35, 40])
+edad['Veterana'] = fuzz.trapmf(edad.universe, [35, 40, 55, 55])
+
+edad.view()
 
 hijos['pocos'] = fuzz.trapmf(hijos.universe, [0, 0, 2, 3])
-hijos['muchos'] = fuzz.trapmf(hijos.universe, [3, 4, 5, 6])
-hijos['demasiados'] = fuzz.trapmf(hijos.universe, [6, 7, 10, 10])
+hijos['moderado'] = fuzz.trapmf(hijos.universe, [2, 3, 5, 6])
+hijos['muchos'] = fuzz.trapmf(hijos.universe, [5, 6, 15, 15])
+
+hijos.view()
 
 # Custom membership functions can be built interactively with a familiar,
 # Pythonic API
-efectividad['low'] = fuzz.trapmf(efectividad.universe, [0, 0, 5, 10])
-efectividad['medium'] = fuzz.trapmf(efectividad.universe, [5, 10, 15, 20])
-efectividad['high'] = fuzz.trapmf(efectividad.universe, [15, 20, 25, 25])
+efectividad['baja'] = fuzz.trapmf(efectividad.universe, [0, 0, 5, 10])
+efectividad['media'] = fuzz.trapmf(efectividad.universe, [5, 10, 15, 20])
+efectividad['alta'] = fuzz.trapmf(efectividad.universe, [15, 20, 25, 25])
 
 #quality['average'].view()
 
 #Reglas random a ver que pasa
-rule1 = ctrl.Rule(MetodoUsado['LargoPlazo'] and edad['Joven'] and hijos['demasiados'], efectividad['low'])
-rule2 = ctrl.Rule(MetodoUsado['LargoPlazo'] and edad['Madura'] and hijos['muchos'], efectividad['medium'])
-rule3 = ctrl.Rule(MetodoUsado['LargoPlazo'] and edad['Vieja'] and hijos['pocos'], efectividad['high'])
-rule4 = ctrl.Rule(MetodoUsado['CortoPlazo'] and edad['Joven'] and hijos['demasiados'], efectividad['low'])
-rule5 = ctrl.Rule(MetodoUsado['CortoPlazo'] and edad['Madura'] and hijos['muchos'], efectividad['medium'])
-rule6 = ctrl.Rule(MetodoUsado['CortoPlazo'] | edad['Vieja'] | hijos['pocos'], efectividad['high'])
+rule1 = ctrl.Rule(MetodoUsado['LargoPlazo'] and edad['Joven'] and hijos['muchos'], efectividad['baja'])
+rule2 = ctrl.Rule(MetodoUsado['LargoPlazo'] and edad['Madura'] and hijos['moderado'], efectividad['media'])
+rule3 = ctrl.Rule(MetodoUsado['LargoPlazo'] and edad['Veterana'] and hijos['pocos'], efectividad['alta'])
+rule4 = ctrl.Rule(MetodoUsado['CortoPlazo'] and edad['Joven'] and hijos['muchos'], efectividad['baja'])
+rule5 = ctrl.Rule(MetodoUsado['CortoPlazo'] and edad['Madura'] and hijos['moderado'], efectividad['media'])
+rule6 = ctrl.Rule(MetodoUsado['CortoPlazo'] | edad['Veterana'] | hijos['pocos'], efectividad['alta'])
 
 #MetodoUsado.view()
 #edad.view()
@@ -63,12 +69,21 @@ rule6 = ctrl.Rule(MetodoUsado['CortoPlazo'] | edad['Vieja'] | hijos['pocos'], ef
 effectiveness_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6])
 effectiveness = ctrl.ControlSystemSimulation(effectiveness_ctrl)
 
+
+
 # Pass inputs to the ControlSystem using Antecedent labels with Pythonic API
 # Note: if you like passing many inputs all at once, use .inputs(dict_of_data)
 
-effectiveness.input['MetodoUsado'] = 20
-effectiveness.input['edad'] = 18
-effectiveness.input['hijos'] = 1
+#Valores de entrada para el fuzzy
+
+a = input("Ingrese el valor del Metodo Anticonceptivo Usado: ")
+b = input("Ingrese la edad: ")
+c = input("Ingrese el numero de hijos: ") 
+
+
+effectiveness.input['MetodoUsado'] = a
+effectiveness.input['edad'] = b
+effectiveness.input['hijos'] = c
 
 # Crunch the numbers
 effectiveness.compute()
@@ -76,6 +91,29 @@ effectiveness.compute()
 print("Efectividad del anticonceptivo: ")
 print (effectiveness.output['efectividad'])
 efectividad.view(sim=effectiveness)
+
+z = effectiveness.output['efectividad']
+
+if 0 <= z <= 6: 
+    print("La efectividad del método usado es mala")
+    
+elif 6 < z <= 20: 
+    print("La efectividad del método usado es media")
+    
+elif 20 < z <= 26:
+    print("La efectividad del método usado es buena")
+
+
+
+
+
+#d = effectiveness.['efectividad']
+
+#print(d)
+
+
+
+
 
 
 
