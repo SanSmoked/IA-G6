@@ -147,11 +147,11 @@ categoria = max(efectividad_categoria(resultado), key=efectividad_categoria(resu
 
 print "La efectividad del metodo es:", categoria
 
-if categoria = 'baja': 
+if categoria == 'baja': 
     print("Experto habla de la calidad baja del metodo")
     
-elif categoria = 'media': 
+elif categoria == 'media': 
     print("Experto habla de la calidad media del metodo")
     
-elif categoria = 'alta':
+elif categoria == 'alta':
     print("Experto habla de la calidad alta del metodo")
