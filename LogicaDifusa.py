@@ -71,7 +71,6 @@ rule6 = ctrl.Rule(MetodoUsado['CortoPlazo'] | edad['Veterana'] | hijos['pocos'],
 #edad.view()
 #hijos.view()
 #efectividad.view()
-
 #rule1.view()
 
 effectiveness_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6])
